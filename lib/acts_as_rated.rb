@@ -113,12 +113,11 @@ module ActiveRecord #:nodoc:
           end
 
           raise RatedError, ":rating_range must be a range object" unless options[:rating_range].nil? || (Range === options[:rating_range])
-          write_inheritable_attribute( :acts_as_rated_options ,
-                                         { :rating_range => options[:rating_range],
-                                           :rating_class => rating_class,
-                                           :stats_class => stats_class,
-                                           :rater_class => rater_class } )
           class_attribute :acts_as_rated_options
+          self.acts_as_rated_options = { :rating_range => options[:rating_range],
+                                         :rating_class => rating_class,
+                                         :stats_class => stats_class,
+                                         :rater_class => rater_class }
 
           class_eval do
             has_many :ratings, :as => :rated, :dependent => :delete_all, :class_name => rating_class.to_s
@@ -378,7 +377,6 @@ module ActiveRecord #:nodoc:
           acts_as_rated_options[:rating_class].constantize.find(:all, :conditions => conds).collect {|r| r.rated_type.constantize.find_by_id r.rated.id }
         end
 
-
         # Find by rating - pass either a specific value or a range and the precision to calculate with
         # * <tt>value</tt> - the value to look for or a range
         # * <tt>precision</tt> - number of decimal digits to round to. Default to 10. Use 0 for integer numbers comparision
@@ -436,6 +434,6 @@ module ActiveRecord #:nodoc:
   end
 end
 
-
 ActiveRecord::Base.send :include, ActiveRecord::Acts::Rated
+
 
